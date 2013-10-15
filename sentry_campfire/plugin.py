@@ -18,8 +18,8 @@ import sentry_campfire
 
 class CampfireOptionsForm(forms.Form):
     url = forms.URLField(required=True,
-                          label='Campfire URL',
-                          help_text='e.g. https://your-subdomain.campfirenow.com')
+                         label='Campfire URL',
+                         help_text='e.g. https://your-subdomain.campfirenow.com')
     token = forms.CharField(required=True,
                             label='API Token')
     rooms = forms.CharField(required=True,
@@ -37,12 +37,11 @@ class CampfireNotification(Plugin):
     author = 'Mustafa Khattab'
     author_url = 'https://github.com/mkhattab/sentry-campfire'
     resource_links = [
-    ('Bug Tracker', 'https://github.com/mkhattab/sentry-campfire/issues'),
-    ('Source', 'https://github.com/mkhattab/sentry-campfire'),
+        ('Bug Tracker', 'https://github.com/mkhattab/sentry-campfire/issues'),
+        ('Source', 'https://github.com/mkhattab/sentry-campfire'),
     ]
 
     project_conf_form = CampfireOptionsForm
-
 
     def is_configured(self, project, **kwargs):
         return all(self.get_option(k, project) for k in ('url', 'token', 'rooms'))
@@ -52,7 +51,7 @@ class CampfireNotification(Plugin):
             return
 
         link = group.get_absolute_url()
-        message = '[%s] %s (%s)' % (event.server_name, event.message, link)
+        message = '[%s] %s (%s)' % (event.server_name, event.message_top(), link)
 
         self.send_notification(event.project, message)
 
@@ -63,7 +62,8 @@ class CampfireNotification(Plugin):
         play_sound = self.get_option('play_sound', project)
         sound = self.get_option('sound', project)
 
-        req = Request(url.strip('/'), token) # The appended slash causes a 404 error
+        # The appended slash causes a 404 error
+        req = Request(url.strip('/'), token)
         campfire = Campfire(req)
 
         for r in rooms.split(','):
@@ -72,4 +72,3 @@ class CampfireNotification(Plugin):
                 room.speak(message)
                 if play_sound:
                     room.play(sound)
-
