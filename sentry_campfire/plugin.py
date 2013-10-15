@@ -51,7 +51,7 @@ class CampfireNotification(Plugin):
             return
 
         link = group.get_absolute_url()
-        message = '[%s] %s (%s)' % (event.server_name, event.message_top(), link)
+        message = '[%s] %s (%s)' % (event.server_name, event.error(), link)
 
         self.send_notification(event.project, message)
 
