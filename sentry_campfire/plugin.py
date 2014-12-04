@@ -11,12 +11,12 @@
 from camplight import Request, Campfire
 from django import forms
 
-from sentry.plugins import Plugin
+from sentry.plugins.bases import notify
 
 import sentry_campfire
 
 
-class CampfireOptionsForm(forms.Form):
+class CampfireOptionsForm(notify.NotificationConfigurationForm):
     url = forms.URLField(required=True,
                          label='Campfire URL',
                          help_text='e.g. https://your-subdomain.campfirenow.com')
@@ -29,7 +29,7 @@ class CampfireOptionsForm(forms.Form):
     play_sound = forms.BooleanField(required=False)
 
 
-class CampfireNotification(Plugin):
+class CampfireNotification(notify.NotificationPlugin):
     title = 'Campfire'
     slug = 'campfire'
     description = 'Send Campfire notifications'
@@ -46,10 +46,7 @@ class CampfireNotification(Plugin):
     def is_configured(self, project, **kwargs):
         return all(self.get_option(k, project) for k in ('url', 'token', 'rooms'))
 
-    def post_process(self, group, event, is_new, is_sample, **kwargs):
-        if not is_new or not self.is_configured(event.project):
-            return
-
+    def notify_users(self, group, event, fail_silently=False):
         link = group.get_absolute_url()
         message = '[%s] %s (%s)' % (dict(event.get_tags()).get('server_name'), event.error(), link)
 
