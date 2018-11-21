@@ -48,7 +48,7 @@ class CampfireNotification(notify.NotificationPlugin):
 
     def notify_users(self, group, event, fail_silently=False, **kwargs):
         link = group.get_absolute_url()
-        message = '[%s] %s (%s)' % (dict(event.get_tags()).get('server_name'), event.error(), link)
+        message = '[%s] %s (%s)' % (dict(event.get_tags()).get('server_name'), event.title, link)
 
         self.send_notification(event.project, message)
 
